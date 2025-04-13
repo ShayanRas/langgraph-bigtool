@@ -11,6 +11,17 @@ from langgraph.types import Send
 from langgraph.utils.runnable import RunnableCallable
 
 from langgraph_bigtool.tools import get_default_retrieval_tool, get_store_arg
+from langchain_anthropic import ChatAnthropic
+import dotenv
+dotenv.load_dotenv()
+import os
+
+
+llm = ChatAnthropic(
+    model="anthropic/claude-3-7-sonnet",
+    temperature=0.1,
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
+)
 
 
 def _add_new(left: list, right: list) -> list:

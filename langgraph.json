@@ -1,0 +1,6 @@
+{
+    "dependencies": ["."],
+    "graphs": {
+      "chat": "./langgraph_bigtool/graph.py:builder"
+    }
+  }
