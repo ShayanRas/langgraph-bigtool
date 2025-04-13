@@ -6,7 +6,6 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool, StructuredTool
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
-from langgraph.store.base import BaseStore
 from langgraph.types import Send
 from langgraph.utils.runnable import RunnableCallable
 
@@ -16,12 +15,16 @@ import dotenv
 dotenv.load_dotenv()
 import os
 
+from langchain_openai import OpenAIEmbeddings
+
 
 llm = ChatAnthropic(
     model="anthropic/claude-3-7-sonnet",
     temperature=0.1,
     api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
+
+default_tool_registry = {}
 
 
 def _add_new(left: list, right: list) -> list:
@@ -92,6 +95,8 @@ def create_agent(
     )
     # If needed, get argument name to inject Store
     store_arg = get_store_arg(retrieve_tools)
+
+    from langgraph.store.base import BaseStore
 
     def call_model(state: State, config: RunnableConfig, *, store: BaseStore) -> State:
         selected_tools = [tool_registry[id] for id in state["selected_tool_ids"]]
@@ -181,4 +186,9 @@ def create_agent(
     builder.add_edge("tools", "agent")
     builder.add_edge("select_tools", "agent")
 
-    return builder
+    return builder.compile()
+
+
+graph = create_agent(llm, default_tool_registry)
+
+print(f"Graph variable created.")
